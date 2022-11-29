@@ -9,6 +9,8 @@ from scipy.stats import pearsonr
 from scipy.optimize import minimize
 import torch
 from torch.utils.data import DataLoader
+import pandas as pd
+pd.options.mode.chained_assignment = None
 
 
 # %% Evaluation
