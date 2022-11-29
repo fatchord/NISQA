@@ -68,17 +68,14 @@ def get_librosa_melspec(
     """
     # Calc spec
     try:
-        start = time.perf_counter()
-        y, sr = lb.core.load(file_path, sr=sr)
-        y = y[100*sr:152*sr]
-        if len(y) < sr * 2:
-            print(f"Warning - short audio {file_path}")
-            y = np.zeros((sr * 52,)).astype(np.float32)
-
-        end = time.perf_counter()
-        print(f"{end - start:.2f}s to load {file_path}")
+        if ms_channel is not None:
+            y, sr = lb.load(file_path, sr=sr, mono=False)
+            if len(y.shape) > 1:
+                y = y[ms_channel, :]
+        else:
+            y, sr = lb.load(file_path, sr=sr)
     except:
-        raise ValueError("Could not load file {}".format(file_path))
+        raise ValueError('Could not load file {}'.format(file_path))
 
     hop_length = int(sr * hop_length)
     win_length = int(sr * win_length)

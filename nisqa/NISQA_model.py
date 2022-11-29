@@ -65,7 +65,6 @@ class nisqaModel(object):
         print("---> Predicting ...")
         if self.args["tr_parallel"]:
             self.model = nn.DataParallel(self.model)
-        start = time.perf_counter()
 
         if self.args["dim"]:
             y_val_hat, y_val = predict_dim(
@@ -89,7 +88,6 @@ class nisqaModel(object):
                 index=False)
 
         print(self.ds_val.df.to_string(index=False))
-        print(f"time taken: {time.perf_counter() - start}")
         return self.ds_val.df
 
     def _train_mos(self):
