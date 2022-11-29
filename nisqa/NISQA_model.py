@@ -10,7 +10,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-pd.options.mode.chained_assignment = None
 
 from tqdm import tqdm
 import yaml
@@ -24,6 +23,8 @@ from .dataset.speech_quality_dataset import SpeechQualityDataset
 from .eval.eval import predict_mos, predict_dim, eval_results
 from .modules.models import NISQA, NISQA_DE, NISQA_DIM
 from .loss.loss import biasLoss
+
+pd.options.mode.chained_assignment = None
 
 
 class nisqaModel(object):
@@ -49,13 +50,13 @@ class nisqaModel(object):
 
     def train(self):
 
-        if self.args["dim"] == True:
+        if self.args["dim"]:
             self._train_dim()
         else:
             self._train_mos()
 
     def evaluate(self, mapping="first_order", do_print=True, do_plot=False):
-        if self.args["dim"] == True:
+        if self.args["dim"]:
             self._evaluate_dim(mapping=mapping, do_print=do_print, do_plot=do_plot)
         else:
             self._evaluate_mos(mapping=mapping, do_print=do_print, do_plot=do_plot)
@@ -66,7 +67,7 @@ class nisqaModel(object):
             self.model = nn.DataParallel(self.model)
         start = time.perf_counter()
 
-        if self.args["dim"] == True:
+        if self.args["dim"]:
             y_val_hat, y_val = predict_dim(
                 self.model,
                 self.ds_val,
