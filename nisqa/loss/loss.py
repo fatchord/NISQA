@@ -2,28 +2,13 @@
 """
 @author: Gabriel Mittag, TU-Berlin
 """
-import os
-import time
-import multiprocessing
-import librosa as lb
 import numpy as np
-import pandas as pd;
-
-pd.options.mode.chained_assignment = None
-import matplotlib.pyplot as plt
-
-from tqdm import tqdm
 from scipy.stats import pearsonr
-from scipy.optimize import minimize
-
 import torch
-from torch.utils.data import DataLoader
-from torch.utils.data import Dataset
-
 
 
 # %% Loss
-class biasLoss(object):
+class BiasLoss(object):
     """
     Bias loss class.
 
@@ -53,9 +38,8 @@ class biasLoss(object):
             b = torch.tensor(self.b, dtype=torch.float).to(yb_hat.device)
             b = b[idx, :]
 
-            yb_hat_map = (b[:, 0] + b[:, 1] * yb_hat[:, 0] + b[:, 2] * yb_hat[:, 0] ** 2 + b[:, 3] * yb_hat[:,
-                                                                                                     0] ** 3).view(-1,
-                                                                                                                   1)
+            yb_hat_map = b[:, 0] + b[:, 1] * yb_hat[:, 0] + b[:, 2] * yb_hat[:, 0] ** 2 + b[:, 3] * yb_hat[:, 0] ** 3
+            yb_hat_map = yb_hat_map.view(-1, 1)
 
             loss_bias = self._nan_mse(yb_hat_map, yb)
             loss_normal = self._nan_mse(yb_hat, yb)

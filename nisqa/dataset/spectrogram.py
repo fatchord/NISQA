@@ -74,6 +74,7 @@ def get_librosa_melspec(
                 y = y[ms_channel, :]
         else:
             y, sr = lb.load(file_path, sr=sr)
+        # y = y[100 * sr:152 * sr]
     except:
         raise ValueError('Could not load file {}'.format(file_path))
 

@@ -22,7 +22,7 @@ from .sheduler.scheduler import earlyStopper, earlyStopper_dim, get_lr
 from .dataset.speech_quality_dataset import SpeechQualityDataset
 from .eval.eval import predict_mos, predict_dim, eval_results
 from .modules.models import NISQA, NISQA_DE, NISQA_DIM
-from .loss.loss import biasLoss
+from .loss.loss import BiasLoss
 
 pd.options.mode.chained_assignment = None
 
@@ -112,7 +112,7 @@ class nisqaModel(object):
             patience=self.args["tr_lr_patience"])
         earlyStp = earlyStopper(self.args["tr_early_stop"])
 
-        biasLoss = biasLoss(
+        bias_loss = BiasLoss(
             self.ds_train.df.db,
             anchor_db=self.args["tr_bias_anchor_db"],
             mapping=self.args["tr_bias_mapping"],
@@ -157,7 +157,7 @@ class nisqaModel(object):
                 y_train_hat[idx] = yb_mos_hat.detach().cpu().numpy()
 
                 # Loss ------------------------------------------------------------
-                lossb = biasLoss.get_loss(yb_mos, yb_mos_hat, idx)
+                lossb = bias_loss.get_loss(yb_mos, yb_mos_hat, idx)
 
                 # Backprop  -------------------------------------------------------
                 lossb.backward()
@@ -177,7 +177,7 @@ class nisqaModel(object):
 
             loss = loss / batch_cnt
 
-            biasLoss.update_bias(y_train, y_train_hat)
+            bias_loss.update_bias(y_train, y_train_hat)
 
             # Evaluate   -----------------------------------------------------------
             if self.args["tr_verbose"] > 0:
@@ -196,7 +196,7 @@ class nisqaModel(object):
             if self.args["tr_verbose"] > 0:
                 print("<---- Validation ---->")
             predict_mos(self.model, self.ds_val, self.args["tr_bs_val"], self.dev,
-                           num_workers=self.args["tr_num_workers"])
+                        num_workers=self.args["tr_num_workers"])
             db_results, r_val = eval_results(
                 self.ds_val.df,
                 dcon=self.ds_val.df_con,
@@ -262,7 +262,7 @@ class nisqaModel(object):
             patience=self.args["tr_lr_patience"])
         earlyStp = earlyStopper_dim(self.args["tr_early_stop"])
 
-        biasLoss_1 = biasLoss(
+        bias_loss_1 = BiasLoss(
             self.ds_train.df.db,
             anchor_db=self.args["tr_bias_anchor_db"],
             mapping=self.args["tr_bias_mapping"],
@@ -270,7 +270,7 @@ class nisqaModel(object):
             do_print=(self.args["tr_verbose"] > 0),
         )
 
-        biasLoss_2 = biasLoss(
+        bias_loss_2 = BiasLoss(
             self.ds_train.df.db,
             anchor_db=self.args["tr_bias_anchor_db"],
             mapping=self.args["tr_bias_mapping"],
@@ -278,7 +278,7 @@ class nisqaModel(object):
             do_print=(self.args["tr_verbose"] > 0),
         )
 
-        biasLoss_3 = biasLoss(
+        bias_loss_3 = BiasLoss(
             self.ds_train.df.db,
             anchor_db=self.args["tr_bias_anchor_db"],
             mapping=self.args["tr_bias_mapping"],
@@ -286,7 +286,7 @@ class nisqaModel(object):
             do_print=(self.args["tr_verbose"] > 0),
         )
 
-        biasLoss_4 = biasLoss(
+        bias_loss_4 = BiasLoss(
             self.ds_train.df.db,
             anchor_db=self.args["tr_bias_anchor_db"],
             mapping=self.args["tr_bias_mapping"],
@@ -294,7 +294,7 @@ class nisqaModel(object):
             do_print=(self.args["tr_verbose"] > 0),
         )
 
-        biasLoss_5 = biasLoss(
+        bias_loss_5 = BiasLoss(
             self.ds_train.df.db,
             anchor_db=self.args["tr_bias_anchor_db"],
             mapping=self.args["tr_bias_mapping"],
@@ -345,11 +345,11 @@ class nisqaModel(object):
                 y_train_hat[idx, :] = yb_mos_hat.detach().cpu().numpy()
 
                 # Loss ------------------------------------------------------------
-                lossb_1 = biasLoss_1.get_loss(yb_mos[:, 0].view(-1, 1), yb_mos_hat[:, 0].view(-1, 1), idx)
-                lossb_2 = biasLoss_2.get_loss(yb_mos[:, 1].view(-1, 1), yb_mos_hat[:, 1].view(-1, 1), idx)
-                lossb_3 = biasLoss_3.get_loss(yb_mos[:, 2].view(-1, 1), yb_mos_hat[:, 2].view(-1, 1), idx)
-                lossb_4 = biasLoss_4.get_loss(yb_mos[:, 3].view(-1, 1), yb_mos_hat[:, 3].view(-1, 1), idx)
-                lossb_5 = biasLoss_5.get_loss(yb_mos[:, 4].view(-1, 1), yb_mos_hat[:, 4].view(-1, 1), idx)
+                lossb_1 = bias_loss_1.get_loss(yb_mos[:, 0].view(-1, 1), yb_mos_hat[:, 0].view(-1, 1), idx)
+                lossb_2 = bias_loss_2.get_loss(yb_mos[:, 1].view(-1, 1), yb_mos_hat[:, 1].view(-1, 1), idx)
+                lossb_3 = bias_loss_3.get_loss(yb_mos[:, 2].view(-1, 1), yb_mos_hat[:, 2].view(-1, 1), idx)
+                lossb_4 = bias_loss_4.get_loss(yb_mos[:, 3].view(-1, 1), yb_mos_hat[:, 3].view(-1, 1), idx)
+                lossb_5 = bias_loss_5.get_loss(yb_mos[:, 4].view(-1, 1), yb_mos_hat[:, 4].view(-1, 1), idx)
 
                 lossb = lossb_1 + lossb_2 + lossb_3 + lossb_4 + lossb_5
 
@@ -371,11 +371,11 @@ class nisqaModel(object):
 
             loss = loss / batch_cnt
 
-            biasLoss_1.update_bias(y_train[:, 0].reshape(-1, 1), y_train_hat[:, 0].reshape(-1, 1))
-            biasLoss_2.update_bias(y_train[:, 1].reshape(-1, 1), y_train_hat[:, 1].reshape(-1, 1))
-            biasLoss_3.update_bias(y_train[:, 2].reshape(-1, 1), y_train_hat[:, 2].reshape(-1, 1))
-            biasLoss_4.update_bias(y_train[:, 3].reshape(-1, 1), y_train_hat[:, 3].reshape(-1, 1))
-            biasLoss_5.update_bias(y_train[:, 4].reshape(-1, 1), y_train_hat[:, 4].reshape(-1, 1))
+            bias_loss_1.update_bias(y_train[:, 0].reshape(-1, 1), y_train_hat[:, 0].reshape(-1, 1))
+            bias_loss_2.update_bias(y_train[:, 1].reshape(-1, 1), y_train_hat[:, 1].reshape(-1, 1))
+            bias_loss_3.update_bias(y_train[:, 2].reshape(-1, 1), y_train_hat[:, 2].reshape(-1, 1))
+            bias_loss_4.update_bias(y_train[:, 3].reshape(-1, 1), y_train_hat[:, 3].reshape(-1, 1))
+            bias_loss_5.update_bias(y_train[:, 4].reshape(-1, 1), y_train_hat[:, 4].reshape(-1, 1))
 
             # Evaluate   -----------------------------------------------------------
             self.ds_train.df["mos_pred"] = y_train_hat[:, 0].reshape(-1, 1)
